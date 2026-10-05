@@ -152,7 +152,7 @@
     const app = initializeApp(cfg.firebase);
     fs = fsMod;
     const auth = authMod.getAuth(app);
-    db = fsMod.getFirestore(app);
+    db = fsMod.getFirestore(app, cfg.firestoreDatabaseId || '(default)');
     quotesCol = fsMod.collection(db, COLLECTION);
     try { await authMod.setPersistence(auth, authMod.browserLocalPersistence); } catch(e){}
 

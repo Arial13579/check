@@ -642,7 +642,7 @@
                         import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js')
                     ]);
                     const app = initializeApp(cfg);
-                    return { app, db: fs.getFirestore(app), fs, auth: authMod.getAuth(app), authMod };
+                    return { app, db: fs.getFirestore(app, CFG.firestoreDatabaseId || '(default)'), fs, auth: authMod.getAuth(app), authMod };
                 } catch(err){ console.warn('firebase init failed', err); return null; }
             })();
             return fbReadyPromise;
