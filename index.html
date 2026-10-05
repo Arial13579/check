@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#F3EEE4">
+    <title>CHECK | הצעת מחיר והסכם להופעה</title>
+    <meta name="description" content="הצעת המחיר וההסכם הדיגיטלי שלך ל-DJ / להופעה חיה — כל הפרטים במקום אחד וחתימה דיגיטלית מאובטחת.">
+
+    <!-- תצוגה מקדימה בוואטסאפ / פייסבוק / טלגרם -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="CHECK · DJ & Live Music">
+    <meta property="og:url" content="https://arial13579.github.io/check/">
+    <meta property="og:title" content="CHECK · הצעת המחיר שלך להופעה מוכנה">
+    <meta property="og:description" content="כל פרטי ההופעה, המחיר וההסכם — לחצו לצפייה ולחתימה דיגיטלית בשתי דקות.">
+    <meta property="og:image" content="https://arial13579.github.io/check/og-image.jpg">
+    <meta property="og:image:secure_url" content="https://arial13579.github.io/check/og-image.jpg">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="CHECK · DJ & Live Music · הצעת מחיר דיגיטלית">
+    <meta property="og:locale" content="he_IL">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="CHECK · הצעת המחיר שלך להופעה מוכנה">
+    <meta name="twitter:description" content="כל פרטי ההופעה, המחיר וההסכם — לחצו לצפייה ולחתימה דיגיטלית.">
+    <meta name="twitter:image" content="https://arial13579.github.io/check/og-image.jpg">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Rubik:wght@500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="theme.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        .page{ max-width:760px; margin:0 auto; padding:22px 16px 0; display:flex; flex-direction:column; gap:26px; }
+        @media(min-width:640px){ .page{ padding-top:40px; gap:30px; } }
+
+        /* ===== כותרת ===== */
+        .top{ display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+        .top .side{ display:flex; align-items:center; gap:10px; color:var(--muted); font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
+        .ticker-wrap{ margin:0 -16px; }
+        @media(min-width:792px){ .ticker-wrap{ margin:0; border-radius:12px; overflow:hidden; border:var(--line); } .ticker-wrap .ticker{ border:0; } }
+
+        /* ===== שער מנהל ===== */
+        .gate{ max-width:440px; margin:0 auto; width:100%; text-align:center; }
+        .gate .panel-body{ display:flex; flex-direction:column; align-items:center; gap:14px; padding:34px 26px; }
+        .gate h2{ margin:0; font-size:24px; font-weight:900; }
+        .gate p{ margin:0; color:var(--muted); font-size:14.5px; line-height:1.7; }
+        .gate .err{ color:var(--bad); font-size:13px; font-weight:700; }
+
+        /* ===== פירוט מחיר במחולל ===== */
+        .breakdown{ border:var(--line); border-radius:14px; background:var(--paper); padding:14px 16px; font-size:14px; display:flex; flex-direction:column; gap:7px; }
+        .breakdown .row{ display:flex; justify-content:space-between; gap:12px; }
+        .breakdown .row span:first-child{ color:var(--ink-2); }
+        .breakdown .row span:last-child{ font-weight:700; white-space:nowrap; }
+        .breakdown .sum{ border-top:2px dashed var(--ink); padding-top:9px; margin-top:2px; font-family:'Rubik',sans-serif; font-weight:900; font-size:17px; }
+        .breakdown .sum span:last-child{ background:var(--acid); border:1.5px solid var(--ink); border-radius:8px; padding:1px 9px; }
+
+        .result{ border:var(--line); border-radius:14px; background:var(--acid); padding:16px; display:flex; flex-direction:column; gap:12px; box-shadow:var(--shadow-sm); }
+        .result .row{ display:flex; gap:8px; }
+        .result .row .field{ font-family:ui-monospace,Menlo,monospace; font-size:12px; padding:10px 12px; }
+        .result p{ margin:0; font-weight:800; font-size:13px; }
+
+        /* ===== כרטיס ההופעה (מצב לקוח) ===== */
+        .ticket{ overflow:hidden; }
+        .ticket-top{ padding:22px 20px 20px; background:var(--ink); color:var(--paper); position:relative; }
+        @media(min-width:640px){ .ticket-top{ padding:28px 30px 26px; } }
+        .ticket-top .kicker{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+        .ticket-top .for{ margin:16px 0 4px; font-size:13px; color:var(--faint); font-weight:700; }
+        .ticket-top .client{ margin:0; font-family:'Rubik',sans-serif; font-weight:900; font-size:clamp(30px,8vw,46px); line-height:1.05; color:#fff; overflow-wrap:anywhere; }
+        .ticket-top .what{ margin-top:10px; font-size:15px; color:var(--acid); font-weight:700; }
+        .sticker{
+            position:absolute; left:18px; bottom:-34px; z-index:2; transform:rotate(-7deg);
+            background:var(--hot); color:#fff; border:var(--line); border-radius:16px; box-shadow:var(--shadow-sm);
+            padding:10px 16px; text-align:center; font-family:'Rubik',sans-serif;
+        }
+        .sticker small{ display:block; font-size:11px; font-weight:800; letter-spacing:.1em; opacity:.9; }
+        .sticker b{ display:block; font-size:clamp(24px,6vw,32px); font-weight:900; line-height:1.1; }
+        .perf{ height:0; border-top:3px dashed var(--ink); position:relative; }
+        .perf::before,.perf::after{ content:""; position:absolute; top:-14px; width:26px; height:26px; border-radius:50%; background:var(--paper); border:var(--line); }
+        .perf::before{ right:-15px; } .perf::after{ left:-15px; }
+        .facts{ display:grid; grid-template-columns:1fr 1fr; gap:0; }
+        @media(min-width:640px){ .facts{ grid-template-columns:repeat(3,1fr); } }
+        .fact{ padding:15px 18px; border-bottom:1.5px solid var(--paper-2); border-left:1.5px solid var(--paper-2); display:flex; flex-direction:column; gap:3px; min-width:0; }
+        .fact .k{ display:flex; align-items:center; gap:6px; font-size:11.5px; font-weight:800; color:var(--muted); letter-spacing:.04em; }
+        .fact .k svg{ width:14px; height:14px; }
+        .fact .v{ font-weight:700; font-size:15.5px; overflow-wrap:anywhere; }
+        .money{ display:grid; grid-template-columns:repeat(3,1fr); border-top:var(--line); }
+        .money > div{ padding:15px 14px; text-align:center; border-left:var(--line); }
+        .money > div:last-child{ border-left:0; }
+        .money .k{ font-size:11.5px; font-weight:800; color:var(--muted); }
+        .money .v{ font-family:'Rubik',sans-serif; font-weight:900; font-size:clamp(17px,4.6vw,22px); margin-top:3px; white-space:nowrap; }
+        .money .total{ background:var(--acid); }
+        .note-box{ margin:0; border-top:var(--line); padding:16px 20px; background:var(--paper); }
+        .note-box .k{ display:flex; align-items:center; gap:7px; font-size:12px; font-weight:800; margin-bottom:6px; }
+        .note-box .k svg{ width:16px; height:16px; }
+        .note-box p{ margin:0; white-space:pre-wrap; line-height:1.65; font-size:14.5px; }
+
+        .setlist{ list-style:none; margin:0; padding:0; display:grid; grid-template-columns:1fr; gap:10px; counter-reset:s; }
+        @media(min-width:640px){ .setlist{ grid-template-columns:1fr 1fr; } }
+        .setlist li{ counter-increment:s; display:flex; align-items:center; gap:12px; padding:12px 14px; border:1.5px solid var(--ink); border-radius:12px; background:#fff; font-weight:600; font-size:14.5px; line-height:1.4; }
+        .setlist li::before{ content:counter(s, decimal-leading-zero); flex:none; font-family:'Rubik',sans-serif; font-weight:900; font-size:12px; color:var(--hot); border:1.5px solid var(--hot); border-radius:7px; padding:3px 6px; }
+
+        .terms{ background:var(--paper); border:1.5px solid var(--ink); border-radius:12px; padding:16px 18px; font-size:13.5px; line-height:1.85; color:var(--ink-2); text-align:justify; }
+        .terms ol{ margin:0; padding-inline-start:20px; } .terms li{ margin-bottom:6px; }
+
+        canvas#sig-canvas{
+            display:block; touch-action:none; width:100%; height:180px; cursor:crosshair; border:var(--line); border-radius:14px;
+            background-color:#fff;
+            background-image:linear-gradient(to top, transparent 37px, rgba(22,18,14,.5) 37px, rgba(22,18,14,.5) 39px, transparent 39px);
+        }
+        .sig-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+        .callout{ border:1.5px solid var(--ink); border-radius:12px; background:#FFF4D6; padding:13px 15px; font-size:13.5px; line-height:1.7; }
+        .agree{ display:flex; align-items:flex-start; gap:10px; font-size:13.5px; line-height:1.6; cursor:pointer; }
+        .agree input{ width:20px; height:20px; margin-top:1px; accent-color:var(--hot); flex:none; }
+        .agree a{ font-weight:800; color:var(--hot-dk); }
+        .done{ border:var(--line); border-radius:14px; background:var(--acid); padding:22px; text-align:center; font-family:'Rubik',sans-serif; font-weight:900; font-size:20px; display:flex; flex-direction:column; align-items:center; gap:8px; box-shadow:var(--shadow-sm); }
+        .done svg{ width:38px; height:38px; }
+        .done span{ font-family:'Heebo',sans-serif; font-weight:500; font-size:14px; }
+        .warnbox{ border:1.5px solid var(--warn); background:#FFF4D6; border-radius:12px; padding:14px; font-size:14px; display:flex; flex-direction:column; gap:4px; }
+        .warnbox p{ margin:0; }
+
+        /* שכבת "מכין PDF" */
+        #pdf-overlay{ position:fixed; inset:0; z-index:9999; background:rgba(243,238,228,.94); display:none; flex-direction:column; align-items:center; justify-content:center; gap:12px; text-align:center; padding:20px; }
+        #pdf-overlay .vinyl{ width:92px; height:92px; border-radius:50%; border:var(--line);
+            background:radial-gradient(circle, var(--hot) 0 15%, var(--ink) 16% 19%, #2a241e 20% 100%);
+            box-shadow:var(--shadow-sm); animation:spin 1.4s linear infinite; position:relative; }
+        #pdf-overlay .vinyl::after{ content:""; position:absolute; inset:14px; border-radius:50%; border:1px solid rgba(255,255,255,.12); }
+        #pdf-overlay b{ font-family:'Rubik',sans-serif; font-size:19px; }
+        #pdf-overlay span{ color:var(--muted); font-size:14px; }
+        @keyframes spin{ to{ transform:rotate(360deg) } }
+
+        /* כפתור צף · הוספה ליומן */
+        #cal-fab-wrap{ position:fixed; z-index:900; left:16px; bottom:calc(env(safe-area-inset-bottom) + 18px); }
+        html.has-cookie-bar #cal-fab-wrap{ bottom:calc(env(safe-area-inset-bottom) + 96px); }
+        #cal-fab{ border-radius:999px; padding:12px 18px; font-size:15px; }
+        #cal-fab.is-busy{ opacity:.7; pointer-events:none; }
+
+        /* ===== מסמך ה-PDF (שחור על לבן) ===== */
+        /* fixed + מוסתר: לא מרחיב את רוחב הדף (בדף RTL, אלמנט שממוקם הרחק משמאל יוצר גלילה אופקית) */
+        #pdf-doc{ position:fixed; left:0; top:0; width:760px; visibility:hidden; pointer-events:none; background:#fff; color:#111; font-family:'Heebo',Arial,sans-serif; z-index:-1; }
+        #pdf-doc *,#pdf-doc *::before,#pdf-doc *::after{ box-sizing:border-box; margin:0; padding:0; }
+        #pdf-doc .doc-inner{ padding:32px 36px; }
+        #pdf-doc .doc-section{ margin-bottom:20px; page-break-inside:avoid; }
+        #pdf-doc .doc-head{ display:flex; align-items:flex-end; justify-content:space-between; border-bottom:4px solid #16120E; padding-bottom:12px; }
+        #pdf-doc .doc-brand{ direction:ltr; unicode-bidi:isolate; font-family:'Rubik',Arial,sans-serif; font-size:36px; font-weight:900; letter-spacing:2px; color:#16120E; line-height:1; }
+        #pdf-doc .doc-brand i{ font-style:normal; color:#FF4F1A; }
+        #pdf-doc .doc-sub{ font-size:10.5px; letter-spacing:2.5px; color:#6E665C; font-weight:700; margin-top:6px; }
+        #pdf-doc .doc-title{ font-size:15px; font-weight:800; color:#16120E; text-align:left; }
+        #pdf-doc .doc-title small{ display:block; font-size:11px; color:#6E665C; font-weight:500; margin-top:3px; }
+        #pdf-doc table{ width:100%; border-collapse:collapse; }
+        #pdf-doc td{ border:1px solid #CFC7B8; padding:9px 11px; font-size:13.5px; vertical-align:top; }
+        #pdf-doc td.k{ background:#F3EEE4; font-weight:700; width:96px; white-space:nowrap; color:#3A332B; }
+        #pdf-doc td.hl{ background:#EEF9C8; font-weight:800; }
+        #pdf-doc .doc-h{ font-family:'Rubik',Arial,sans-serif; font-size:15px; font-weight:800; color:#16120E; border-right:5px solid #FF4F1A; padding-right:9px; margin-bottom:11px; }
+        /* html2canvas מצייר סימני רשימה בצד הלא נכון ב-RTL — לכן הסימון נכתב כטקסט */
+        #pdf-doc ul,#pdf-doc ol{ list-style:none; }
+        #pdf-doc li .mk{ display:inline-block; min-width:20px; font-weight:800; color:#FF4F1A; }
+        #pdf-doc li{ font-size:12.5px; margin-bottom:5px; line-height:1.55; color:#3A332B; }
+        #pdf-doc .doc-notes{ font-size:12.5px; line-height:1.6; white-space:pre-wrap; background:#FAF7F1; border:1px solid #E4DCCD; padding:10px 12px; border-radius:6px; color:#3A332B; }
+        #pdf-doc .terms-pdf li{ font-size:11.5px; line-height:1.75; text-align:justify; color:#4A4238; }
+        #pdf-doc .doc-sign{ border:1.5px solid #16120E; border-radius:8px; padding:16px; }
+        #pdf-doc .doc-sign p{ font-size:13px; line-height:1.6; margin-bottom:11px; color:#3A332B; }
+        #pdf-doc img.sig{ display:block; width:300px; height:120px; object-fit:contain; border:1px solid #A39A8C; background:#fff; border-radius:4px; }
+        #pdf-doc .doc-meta{ font-size:11px; color:#6E665C; margin-top:9px; line-height:1.6; }
+        #pdf-doc .doc-foot{ text-align:center; font-size:10px; color:#A39A8C; letter-spacing:1px; margin-top:26px; border-top:1px solid #E4DCCD; padding-top:12px; }
+
+        @media print{
+            body.printing-doc{ background:#fff !important; }
+            body.printing-doc>*:not(#pdf-doc){ display:none !important; }
+            body.printing-doc #pdf-doc{ position:static !important; visibility:visible !important; width:100% !important; z-index:auto !important; }
+            #pdf-doc{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+        }
+    </style>
+</head>
+<body>
+    <div id="pdf-overlay" role="status" aria-live="polite">
+        <div class="vinyl"></div>
+        <b>מכין את ההסכם החתום ושולח…</b>
+        <span>רגע אחד, אין צורך לסגור את הדף</span>
+    </div>
+
+    <div class="page">
+        <header class="top rise">
+            <a class="wordmark" href="./" aria-label="CHECK">
+                <span class="mark"><i data-i="mark"></i></span>
+                <span class="name" id="brand-name">CHECK<i>.</i></span>
+            </a>
+            <div class="side"><span class="eq" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b></span><span id="brand-tagline">DJ · Live Music · Events</span></div>
+        </header>
+
+        <div class="ticker-wrap rise" aria-hidden="true">
+            <div class="ticker"><div class="track">
+                <span>DJ</span><span>Live Band</span><span>Saxophone</span><span>Percussion</span><span>Weddings</span><span>Bar · Bat Mitzvah</span><span>Corporate</span><span>Private Parties</span>
+                <span>DJ</span><span>Live Band</span><span>Saxophone</span><span>Percussion</span><span>Weddings</span><span>Bar · Bat Mitzvah</span><span>Corporate</span><span>Private Parties</span>
+            </div></div>
+        </div>
+
+        <!-- ============ שער כניסת מנהל ============
+             מוצג רק כשאין ?q= בכתובת. הכניסה מוגבלת לחשבון הגוגל שמוגדר ב-adminEmail
+             (config.js), וההתחברות נשמרת בדפדפן כך שאין צורך להתחבר בכל פעם. -->
+        <section id="admin-gate" class="gate panel rise hidden">
+            <div class="panel-body">
+                <span class="tag ink">Backstage</span>
+                <h2>כניסה לאזור האמן</h2>
+                <p>כדי ליצור הצעות מחיר חדשות יש להתחבר עם חשבון הגוגל המורשה.</p>
+                <button type="button" id="admin-signin-btn" class="btn btn-hot">
+                    <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.8 1.1 8 3l5.7-5.7C34.6 6.1 29.6 4 24 4c-7.7 0-14.4 4.4-17.7 10.7z"/><path fill="#4CAF50" d="M24 44c5.5 0 10.4-1.9 14.3-5.1l-6.6-5.6C29.6 35 26.9 36 24 36c-5.3 0-9.7-3.1-11.3-7.5l-6.6 5.1C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.7l6.6 5.6C39.9 37.1 44 31.4 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>
+                    התחברות עם Google
+                </button>
+                <p id="admin-gate-err" class="err" style="display:none"></p>
+            </div>
+        </section>
+
+        <!-- ============ מצב מנהל · מחולל הצעות ============ -->
+        <section id="admin-section" class="panel rise hidden">
+            <div class="panel-head">
+                <div class="step"><span class="num">NEW</span><h2>הצעת מחיר חדשה</h2></div>
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap">
+                    <span id="admin-user-email" style="font-size:12px; color:var(--muted)"></span>
+                    <a href="dashboard.html" class="btn btn-sm btn-acid"><i data-i="dashboard"></i> לוח בקרה</a>
+                    <button type="button" id="admin-signout-btn" class="btn btn-sm"><i data-i="logout"></i> התנתק</button>
+                </div>
+            </div>
+            <div class="panel-body">
+                <form id="creator-form" class="grid2" autocomplete="off">
+                    <div><label class="lbl" for="in_clientName">לכבוד (שם הלקוח) *</label><input type="text" id="in_clientName" required class="field" placeholder="שם מלא / חברה"></div>
+                    <div><label class="lbl" for="in_eventType">סוג האירוע *</label><input type="text" id="in_eventType" required class="field" placeholder="חתונה / בר מצווה / אירוע חברה" list="event-types"></div>
+                    <datalist id="event-types"><option value="חתונה"><option value="בר מצווה"><option value="בת מצווה"><option value="חינה"><option value="ברית / בריתה"><option value="יום הולדת"><option value="אירוע חברה"><option value="מסיבה פרטית"></datalist>
+
+                    <div class="span2">
+                        <label class="lbl" for="in_service">הרכב / שירות *</label>
+                        <select id="in_service" class="field" required></select>
+                    </div>
+
+                    <div><label class="lbl" for="in_location">מיקום האירוע *</label><input type="text" id="in_location" required class="field" placeholder="שם האולם / הגן, עיר"></div>
+                    <div><label class="lbl" for="in_date">תאריך האירוע *</label><input type="text" id="in_date" required class="field ltr" style="text-align:left" inputmode="numeric" maxlength="10" placeholder="DD/MM/YYYY"></div>
+                    <div><label class="lbl" for="in_startTime">שעת התחלה *</label><input type="text" id="in_startTime" required class="field ltr" style="text-align:left" inputmode="numeric" maxlength="5" placeholder="HH:MM"></div>
+                    <div><label class="lbl" for="in_endTime">שעת סיום *</label><input type="text" id="in_endTime" required class="field ltr" style="text-align:left" inputmode="numeric" maxlength="5" placeholder="HH:MM"></div>
+                    <div><label class="lbl" for="in_guests">כמות מוזמנים (משוער) *</label><input type="number" id="in_guests" required min="1" class="field" placeholder="למשל 300"></div>
+                    <div>
+                        <label class="lbl" for="in_distance">מרחק נסיעה (ק"מ) <small>· מחושב אוטומטית</small></label>
+                        <input type="number" id="in_distance" min="0" class="field" placeholder="0">
+                        <p id="distance-status" class="hint"></p>
+                    </div>
+
+                    <div id="price-breakdown" class="breakdown span2 hidden"></div>
+
+                    <div><label class="lbl" for="in_price">מחיר כולל (₪) * <small>· מחושב, ניתן לעריכה</small></label><input type="number" id="in_price" required class="field" placeholder="מחושב לפי הנתונים"></div>
+                    <div><label class="lbl" for="in_deposit">מקדמה (₪) <small>· ברירת מחדל 1,000</small></label><input type="number" id="in_deposit" value="1000" class="field" placeholder="1000"></div>
+                    <div class="span2"><label class="lbl" for="in_notes">הערות / סיכומים <small>· אופציונלי</small></label><textarea id="in_notes" rows="2" class="field" placeholder="לדוגמה: שיר כניסה לחופה, סט מזרחית בסוף, מכונת עשן..."></textarea></div>
+
+                    <button type="submit" id="gen-btn" class="btn btn-hot btn-lg btn-block span2"><i data-i="link"></i> צור קישור ללקוח</button>
+                </form>
+
+                <div id="link-result" class="result hidden" style="margin-top:18px">
+                    <p>✓ הקישור מוכן — נפתח ישירות בהצעת המחיר</p>
+                    <div class="row">
+                        <input type="text" id="shareable-url" readonly dir="ltr" class="field">
+                        <button type="button" id="copy-btn" class="btn btn-sm btn-ink"><i data-i="copy"></i><span id="copy-text">העתק</span></button>
+                    </div>
+                    <a id="wa-share-btn" href="#" target="_blank" rel="noopener" class="btn btn-wa btn-block"><i data-i="chat"></i> שלח ללקוח בוואטסאפ</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ מצב לקוח ============ -->
+        <main id="client-view" class="hidden" style="display:flex; flex-direction:column; gap:26px">
+
+            <section class="panel ticket rise" aria-label="פרטי ההצעה">
+                <div class="ticket-top">
+                    <div class="kicker">
+                        <span class="tag">הצעת מחיר והסכם</span>
+                        <span id="view_quoteId" class="ltr" style="font-family:ui-monospace,Menlo,monospace; font-size:12px; color:var(--faint)"></span>
+                    </div>
+                    <p class="for">לכבוד</p>
+                    <h1 class="client" id="view_clientName"></h1>
+                    <div class="what" id="view_service"></div>
+                    <div class="sticker"><small>מחיר כולל</small><b id="view_price"></b></div>
+                </div>
+                <div class="perf"></div>
+                <div class="facts" style="padding-top:22px">
+                    <div class="fact"><span class="k"><i data-i="party"></i>סוג האירוע</span><span class="v" id="view_eventType"></span></div>
+                    <div class="fact"><span class="k"><i data-i="calendar"></i>תאריך</span><span class="v ltr" id="view_date" style="text-align:right"></span></div>
+                    <div class="fact"><span class="k"><i data-i="pin"></i>מיקום</span><span class="v" id="view_location"></span></div>
+                    <div class="fact"><span class="k"><i data-i="clock"></i>שעות</span><span class="v" id="view_hours"></span></div>
+                    <div class="fact"><span class="k"><i data-i="users"></i>מוזמנים</span><span class="v" id="view_guests"></span></div>
+                    <div class="fact"><span class="k"><i data-i="music"></i>הרכב</span><span class="v" id="view_service2"></span></div>
+                </div>
+                <div class="money">
+                    <div class="total"><div class="k">מחיר כולל</div><div class="v" id="view_price2"></div></div>
+                    <div><div class="k">מקדמה</div><div class="v" id="view_deposit"></div></div>
+                    <div><div class="k">יתרה בסיום</div><div class="v" id="view_balance"></div></div>
+                </div>
+                <div id="view_notes_container" class="note-box hidden">
+                    <div class="k"><i data-i="info"></i>הערות וסיכומים</div>
+                    <p id="view_notes"></p>
+                </div>
+            </section>
+
+            <section class="panel rise">
+                <div class="panel-head"><div class="step"><span class="num">01</span><h2>מה כלול בהופעה</h2></div><span class="eq" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b></span></div>
+                <div class="panel-body"><ul id="pkg-list" class="setlist"></ul></div>
+            </section>
+
+            <section class="panel rise">
+                <div class="panel-head"><div class="step"><span class="num">02</span><h2>תנאי ההסכם וביטולים</h2></div></div>
+                <div class="panel-body"><div id="terms-text" class="terms"></div></div>
+            </section>
+
+            <section id="sig-section" class="panel rise">
+                <div class="panel-head"><div class="step"><span class="num">03</span><h2>אישור וחתימה</h2></div><i data-i="pen" style="width:22px;height:22px"></i></div>
+                <div class="panel-body">
+                    <form id="signature-form" style="display:flex; flex-direction:column; gap:18px">
+                        <div>
+                            <div class="sig-head">
+                                <label class="lbl" style="margin:0" for="sig-canvas">חתמו בתוך התיבה *</label>
+                                <button type="button" id="clear-sig" class="link">ניקוי</button>
+                            </div>
+                            <canvas id="sig-canvas" aria-label="תיבת חתימה"></canvas>
+                            <p class="hint">תאריך: <span id="sign-date" class="ltr"></span></p>
+                        </div>
+
+                        <div id="pdf-hide-controls" style="display:flex; flex-direction:column; gap:16px">
+                            <div class="callout"><b>מה קורה בלחיצה:</b> ה-PDF המלא של ההסכם יירד למכשיר שלכם, ובמקביל האישור והחתימה יישלחו אלינו. לחיזוק התוקף המשפטי של החתימה הדיגיטלית מתועדים גם תאריך, שעה, כתובת IP וסוג הדפדפן.</div>
+                            <label class="agree">
+                                <input type="checkbox" id="agree-terms" required>
+                                <span>קראתי ואני מאשר/ת את <a href="terms.html" target="_blank" rel="noopener">תנאי השימוש</a> ואת <a href="privacy.html" target="_blank" rel="noopener">מדיניות הפרטיות</a>.</span>
+                            </label>
+                            <button type="submit" id="submit-btn" class="btn btn-hot btn-lg btn-block"><i data-i="shield"></i> אישור ההסכם, הורדת PDF ושליחה</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </main>
+
+        <footer class="site-foot">
+            <div class="wordmark" style="justify-content:center"><span class="name" style="font-size:20px" id="foot-brand">CHECK<i>.</i></span></div>
+            <p id="foot-contact" style="margin:8px 0 0"></p>
+            <nav class="pills" aria-label="מסמכים משפטיים">
+                <a href="terms.html">תקנון ותנאי שימוש</a>
+                <a href="privacy.html">פרטיות ועוגיות</a>
+                <a href="accessibility.html">הצהרת נגישות</a>
+            </nav>
+            <p style="margin:0">© <span id="year"></span> · כל הזכויות שמורות</p>
+        </footer>
+    </div>
+
+    <div id="pdf-doc"></div>
+
+    <!-- כפתור צף · הוספת האירוע ליומן (רק בתצוגת הלקוח) -->
+    <div id="cal-fab-wrap" class="hidden">
+        <button type="button" id="cal-fab" class="btn btn-ink"><i data-i="calendar"></i><span id="cal-fab-label">הוסף ליומן</span></button>
+    </div>
+
+    <iframe name="fs-sink" title="sink" style="position:absolute;width:0;height:0;border:0;left:-9999px;top:0"></iframe>
+    <form id="fs-form" method="POST" enctype="multipart/form-data" target="fs-sink" accept-charset="UTF-8" style="display:none">
+        <input type="hidden" name="_subject" id="fs_subject">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="שם הלקוח" id="fs_name">
+        <input type="hidden" name="סוג אירוע" id="fs_type">
+        <input type="hidden" name="הרכב / שירות" id="fs_service">
+        <input type="hidden" name="מיקום" id="fs_loc">
+        <input type="hidden" name="תאריך האירוע" id="fs_date">
+        <input type="hidden" name="שעות" id="fs_hours">
+        <input type="hidden" name="כמות מוזמנים" id="fs_guests">
+        <input type="hidden" name="מחיר כולל" id="fs_price">
+        <input type="hidden" name="מקדמה" id="fs_deposit">
+        <input type="hidden" name="יתרה לתשלום" id="fs_balance">
+        <input type="hidden" name="הערות" id="fs_notes">
+        <input type="hidden" name="נחתם בתאריך" id="fs_signed">
+        <input type="hidden" name="כתובת IP" id="fs_ip">
+        <input type="hidden" name="דפדפן (User Agent)" id="fs_ua">
+        <input type="hidden" name="הורדת ההסכם החתום (PDF)" id="fs_link">
+        <input type="file" name="attachment" id="fs_files" multiple>
+    </form>
+
+    <script src="config.js"></script>
+    <script src="icons.js"></script>
+    <script src="pricing.js"></script>
+    <script>
+        CheckIcons.paint();
+
+        /* ================= הגדרות ================= */
+        const CFG = window.CHECK_CONFIG || {};
+        const BIZ = Object.assign({ name: 'CHECK', tagline: '', email: '', phone: '' }, CFG.business || {});
+        const SUPPLIER_EMAIL = BIZ.email || CFG.adminEmail || '';
+        const QUOTES_COLLECTION = 'check_quotes';
+
+        /* ---- קבלת ה-PDF החתום למייל ----
+           דרך א' (מומלצת): נכנסים ל-https://web3forms.com , מזינים את המייל שב-config.js,
+           מקבלים Access Key ומדביקים אותו כאן. ה-PDF יגיע מצורף למייל עם אישור שליחה אמיתי.
+           דרך ב' (אוטומטית כשהשדה ריק): FormSubmit — בפעם הראשונה מגיע מייל הפעלה
+           מ-FormSubmit לתיבה, ויש ללחוץ בו "Activate" פעם אחת בלבד. */
+        const WEB3FORMS_KEY = "";
+
+        const P = window.CHECK_PRICING;
+
+        // מיתוג מתוך config.js
+        document.getElementById('brand-name').innerHTML = esc(BIZ.name) + '<i>.</i>';
+        document.getElementById('foot-brand').innerHTML = esc(BIZ.name) + '<i>.</i>';
+        if (BIZ.tagline) document.getElementById('brand-tagline').textContent = BIZ.tagline;
+        document.getElementById('year').textContent = new Date().getFullYear();
+        document.getElementById('foot-contact').innerHTML = [
+            BIZ.email ? `<a href="mailto:${esc(BIZ.email)}">${esc(BIZ.email)}</a>` : '',
+            BIZ.phone ? `<a href="tel:${esc(BIZ.phone.replace(/[^\d+]/g, ''))}" class="ltr">${esc(BIZ.phone)}</a>` : ''
+        ].filter(Boolean).join(' · ');
+
+        // רשימת ההרכבים במחולל
+        document.getElementById('in_service').innerHTML = Object.entries(P.SERVICES)
+            .map(([k, s]) => `<option value="${k}">${esc(s.label)} · מ-₪${s.base.toLocaleString()}</option>`).join('');
+
+        /* ================= חתימה ================= */
+        const canvas = document.getElementById('sig-canvas');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false, hasSigned = false, lastSigDataUrl = '', lastSigMeta = null;
+
+        function isDeleting(e){ return !!(e && typeof e.inputType === 'string' && e.inputType.indexOf('delete') === 0); }
+
+        // תאריך → DD/MM/YYYY (הלוכסנים נוספים אוטומטית)
+        function formatDate(i, e){
+            const v = i.value.replace(/\D/g, '').slice(0, 8);
+            const del = isDeleting(e);
+            let out = v.slice(0, 2);
+            if (v.length >= 3) out += '/' + v.slice(2, 4);
+            else if (v.length === 2 && !del) out += '/';
+            if (v.length >= 5) out += '/' + v.slice(4, 8);
+            else if (v.length === 4 && !del) out += '/';
+            i.value = out;
+        }
+        // שעה → HH:MM (הנקודתיים נוספות אוטומטית)
+        function formatTime(i, e){
+            const v = i.value.replace(/\D/g, '').slice(0, 4);
+            const del = isDeleting(e);
+            let out = v.slice(0, 2);
+            if (v.length >= 3) out += ':' + v.slice(2, 4);
+            else if (v.length === 2 && !del) out += ':';
+            i.value = out;
+        }
+
+        /* ================= תמחור אוטומטי (הטבלאות עצמן ב-pricing.js) ================= */
+        let priceTouched = false;
+
+        function parseHM(v){
+            const m = /^(\d{1,2}):(\d{2})$/.exec(String(v || '').trim());
+            if (!m) return null;
+            const h = +m[1], mm = +m[2];
+            if (h > 23 || mm > 59) return null;
+            return h * 60 + mm;
+        }
+        // משך האירוע בדקות (חוצה חצות אם צריך)
+        function durationMinutes(startStr, endStr){
+            const s = parseHM(startStr), e = parseHM(endStr);
+            if (s == null || e == null) return null;
+            let d = e - s; if (d <= 0) d += 24 * 60;
+            return d;
+        }
+        function fmtDur(min){ const h = Math.floor(min / 60), m = min % 60; return h + ':' + String(m).padStart(2, '0'); }
+        // ניסוח עברי של משך ההופעה — "חמש שעות", "ארבע שעות וחצי"...
+        function activityHoursWord(startStr, endStr){
+            const mins = durationMinutes(startStr, endStr);
+            if (mins == null || mins <= 0) return '';
+            const h = Math.floor(mins / 60), m = mins % 60;
+            const names = { 1:'שעה', 2:'שעתיים', 3:'שלוש שעות', 4:'ארבע שעות', 5:'חמש שעות', 6:'שש שעות',
+                            7:'שבע שעות', 8:'שמונה שעות', 9:'תשע שעות', 10:'עשר שעות', 11:'אחת עשרה שעות', 12:'שתים עשרה שעות' };
+            let base = names[h] || (h + ' שעות');
+            if (m === 30){
+                if (h === 0) base = 'חצי שעה'; else if (h === 1) base = 'שעה וחצי'; else if (h === 2) base = 'שעתיים וחצי'; else base += ' וחצי';
+            } else if (m === 15){ base = h === 0 ? 'רבע שעה' : base + ' ורבע'; }
+            else if (m === 45){ base += ' ושלושת רבעי השעה'; }
+            else if (m !== 0){ base = h > 0 ? `${h}:${String(m).padStart(2, '0')} שעות` : `${m} דקות`; }
+            return base;
+        }
+        function hoursWordPlain(h){
+            return ({ 1:'שעה', 2:'שעתיים', 3:'שלוש שעות', 4:'ארבע שעות', 5:'חמש שעות', 6:'שש שעות' })[h] || (h + ' שעות');
+        }
+        function tierFor(tiers, n){ return tiers.find(t => n <= t.max) || tiers[tiers.length - 1]; }
+
+        // תוספת זמן מעבר לשעות הבסיס של ההרכב — מעוגל לרבע שעה, לפי מחיר שעה נוספת של ההרכב
+        function extraTimeCost(svc, durMin){
+            if (durMin == null) return { extraMin: 0, cost: 0 };
+            let extraMin = durMin - svc.hours * 60;
+            if (extraMin <= 0) return { extraMin: 0, cost: 0 };
+            extraMin = Math.round(extraMin / 15) * 15;
+            const whole = Math.floor(extraMin / 60), frac = extraMin - whole * 60;
+            const cost = whole * svc.extraHour + Math.round(svc.extraHour * (P.EXTRA_FRACTION[frac] || 0));
+            return { extraMin, cost };
+        }
+
+        function computeQuote(){
+            const g = Number(document.getElementById('in_guests').value) || 0;
+            if (g <= 0) return null;
+            const svc = P.SERVICES[document.getElementById('in_service').value] || Object.values(P.SERVICES)[0];
+            const km = Number(document.getElementById('in_distance').value) || 0;
+            const gt = tierFor(P.GUEST_TIERS, g), tt = tierFor(P.TRAVEL_TIERS, km);
+            const et = extraTimeCost(svc, durationMinutes(document.getElementById('in_startTime').value, document.getElementById('in_endTime').value));
+            return {
+                svc, base: svc.base, sound: gt.price, soundLabel: gt.label,
+                travel: tt.price, travelLabel: tt.label,
+                extraMin: et.extraMin, extraCost: et.cost,
+                total: svc.base + gt.price + tt.price + et.cost
+            };
+        }
+
+        function onCalcInputs(){
+            const q = computeQuote();
+            const box = document.getElementById('price-breakdown');
+            if (!q) { box.classList.add('hidden'); box.innerHTML = ''; return; }
+            box.classList.remove('hidden');
+            const row = (k, v) => `<div class="row"><span>${k}</span><span>₪${v.toLocaleString()}</span></div>`;
+            let html = row(`${esc(q.svc.label)} · עד ${hoursWordPlain(q.svc.hours)}`, q.base);
+            if (q.sound > 0) html += row(`הגברה מוגדלת · ${q.soundLabel}`, q.sound);
+            if (q.travel > 0) html += row(`נסיעה · ${q.travelLabel}`, q.travel);
+            if (q.extraCost > 0) html += row(`זמן נוסף · ${fmtDur(q.extraMin)} שעות`, q.extraCost);
+            html += `<div class="row sum"><span>סה"כ מחיר מוצע</span><span>₪${q.total.toLocaleString()}</span></div>`;
+            html += `<div><button type="button" class="link" id="recalc-btn" style="font-size:13px">⟳ עדכן את שדה המחיר לסכום זה</button></div>`;
+            box.innerHTML = html;
+            document.getElementById('recalc-btn').addEventListener('click', () => { priceTouched = false; onCalcInputs(); });
+            if (!priceTouched) document.getElementById('in_price').value = q.total;
+        }
+
+        /* ================= חישוב מרחק אוטומטי ================= */
+        let distanceTouched = false, lastGeoQuery = '';
+
+        function haversineKm(a, b){
+            const R = 6371, toRad = d => d * Math.PI / 180;
+            const dLat = toRad(b.lat - a.lat), dLon = toRad(b.lon - a.lon);
+            const s = Math.sin(dLat/2)**2 + Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLon/2)**2;
+            return R * 2 * Math.atan2(Math.sqrt(s), Math.sqrt(1 - s));
+        }
+        // מנסה כמה וריאציות של הכתובת (העיר בסוף לרוב מזוהה מהר); Nominatim מוגבל לבקשה אחת בשנייה
+        async function geocodeIL(raw){
+            const clean = raw.replace(/,?\s*ישראל\s*$/, '').replace(/[,،]/g, ' ').trim();
+            const w = clean.split(/\s+/).filter(Boolean);
+            const cands = [];
+            const push = s => { s = (s || '').trim(); if (s && !cands.includes(s)) cands.push(s); };
+            if (w.length >= 2) push(w.slice(-2).join(' '));
+            if (w.length >= 1) push(w.slice(-1).join(' '));
+            push(clean);
+            if (w.length >= 2) push(w.slice(1).join(' '));
+            const list = cands.slice(0, 4);
+            for (let i = 0; i < list.length; i++){
+                try {
+                    const r = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=il&q=' + encodeURIComponent(list[i] + ', ישראל'), { headers: { 'Accept-Language': 'he' } });
+                    const j = await r.json();
+                    if (j && j[0]) return { lat: +j[0].lat, lon: +j[0].lon, name: (j[0].display_name || '').split(',').slice(0, 2).join(', ') };
+                } catch(e){}
+                if (i < list.length - 1) await new Promise(res => setTimeout(res, 1100));
+            }
+            return null;
+        }
+        async function drivingKm(from, to){
+            try {
+                const r = await fetch(`https://router.project-osrm.org/route/v1/driving/${from.lon},${from.lat};${to.lon},${to.lat}?overview=false`);
+                const j = await r.json();
+                if (j && j.routes && j.routes[0]) return j.routes[0].distance / 1000;
+            } catch(e){}
+            return null;
+        }
+        async function autoDistance(){
+            const loc = document.getElementById('in_location').value.trim();
+            const status = document.getElementById('distance-status');
+            if (!loc || distanceTouched || loc === lastGeoQuery) return;
+            lastGeoQuery = loc;
+            status.textContent = `מחשב מרחק מ${P.ORIGIN.name}…`; status.className = 'hint';
+            try {
+                const g = await geocodeIL(loc);
+                if (!g) { status.textContent = 'המיקום לא זוהה — אפשר להזין מרחק ידנית'; status.className = 'hint warn'; return; }
+                let km = await drivingKm(P.ORIGIN, g), approx = false;
+                if (km == null) { km = haversineKm(P.ORIGIN, g) * 1.3; approx = true; }
+                km = Math.round(km);
+                if (!distanceTouched) { document.getElementById('in_distance').value = km; onCalcInputs(); }
+                status.textContent = `${approx ? '≈ ' : ''}${km} ק"מ נסיעה מ${P.ORIGIN.name} · ${g.name}`;
+                status.className = 'hint ok';
+            } catch(e){
+                console.warn('autoDistance', e);
+                status.textContent = 'לא ניתן לחשב אוטומטית — הזינו מרחק ידנית'; status.className = 'hint warn';
+            }
+        }
+
+        // חיבור אירועי הטופס
+        const $ = id => document.getElementById(id);
+        $('in_date').addEventListener('input', e => formatDate(e.target, e));
+        ['in_startTime', 'in_endTime'].forEach(id => $(id).addEventListener('input', e => { formatTime(e.target, e); onCalcInputs(); }));
+        $('in_guests').addEventListener('input', onCalcInputs);
+        $('in_service').addEventListener('change', onCalcInputs);
+        $('in_location').addEventListener('blur', autoDistance);
+        $('in_distance').addEventListener('input', () => { distanceTouched = true; onCalcInputs(); });
+        $('in_price').addEventListener('input', () => { priceTouched = true; });
+        $('creator-form').addEventListener('submit', generateShareLink);
+        $('copy-btn').addEventListener('click', copyGeneratedLink);
+        $('signature-form').addEventListener('submit', handleSignatureSubmit);
+        $('clear-sig').addEventListener('click', clearSignature);
+
+        /* ---- ציור החתימה ---- */
+        function resizeCanvas(){
+            const prev = hasSigned ? canvas.toDataURL() : null;
+            const r = canvas.getBoundingClientRect();
+            canvas.width = r.width; canvas.height = r.height;
+            ctx.strokeStyle = '#16120E'; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+            if (prev){ const im = new Image(); im.onload = () => ctx.drawImage(im, 0, 0, canvas.width, canvas.height); im.src = prev; }
+        }
+        window.addEventListener('resize', () => setTimeout(resizeCanvas, 150));
+        function pos(e){ const r = canvas.getBoundingClientRect(); const x = e.touches ? e.touches[0].clientX : e.clientX; const y = e.touches ? e.touches[0].clientY : e.clientY; return { x: x - r.left, y: y - r.top }; }
+        function down(e){ isDrawing = true; hasSigned = true; const p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); }
+        function move(e){ if (!isDrawing) return; e.preventDefault(); const p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); }
+        function up(){ isDrawing = false; }
+        canvas.addEventListener('mousedown', down); canvas.addEventListener('mousemove', move); canvas.addEventListener('mouseup', up); canvas.addEventListener('mouseleave', up);
+        canvas.addEventListener('touchstart', down, { passive: false }); canvas.addEventListener('touchmove', move, { passive: false }); canvas.addEventListener('touchend', up);
+        function clearSignature(){ ctx.clearRect(0, 0, canvas.width, canvas.height); hasSigned = false; }
+
+        /* ================= קידוד הקישור (UTF-8 → base64url) ================= */
+        function b64UrlEncode(str){
+            const bytes = new TextEncoder().encode(str);
+            let bin = ''; bytes.forEach(b => bin += String.fromCharCode(b));
+            return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+        }
+        function b64UrlDecode(str){
+            str = String(str).replace(/-/g, '+').replace(/_/g, '/');
+            while (str.length % 4) str += '=';
+            const bin = atob(str), bytes = new Uint8Array(bin.length);
+            for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+            return new TextDecoder().decode(bytes);
+        }
+        function genQuoteId(){ return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+
+        /* ================= Firebase (מסד הנתונים של לוח הבקרה) =================
+           נטען רק כשצריך (כניסת מנהל / חתימת לקוח) — לא מאט את טעינת הדף. */
+        let fbReadyPromise = null;
+        function initFirebase(){
+            if (fbReadyPromise) return fbReadyPromise;
+            fbReadyPromise = (async () => {
+                try {
+                    const cfg = CFG.firebase;
+                    if (!cfg || !cfg.apiKey) return null;
+                    const [{ initializeApp }, fs, authMod] = await Promise.all([
+                        import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js'),
+                        import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js'),
+                        import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js')
+                    ]);
+                    const app = initializeApp(cfg);
+                    return { app, db: fs.getFirestore(app), fs, auth: authMod.getAuth(app), authMod };
+                } catch(err){ console.warn('firebase init failed', err); return null; }
+            })();
+            return fbReadyPromise;
+        }
+
+        /* ================= שער כניסת מנהל =================
+           פועל רק כשאין ?q= בכתובת. לקוח שמוחק את ה-?q= או נכנס ישירות לכתובת
+           לעולם לא יראה את מחולל ההצעות — רק החשבון שמוגדר ב-adminEmail. */
+        function showAdminGate(){ $('admin-gate').classList.remove('hidden'); $('admin-section').classList.add('hidden'); }
+        function showAdminGateError(msg){ showAdminGate(); const e = $('admin-gate-err'); e.textContent = msg; e.style.display = 'block'; }
+        async function initAdminGate(){
+            showAdminGate();
+            if (!CFG.firebase || !CFG.firebase.apiKey){
+                showAdminGateError('Firebase עדיין לא הוגדר — יש להדביק את פרטי הפרויקט בקובץ config.js (ההוראות ב-README).');
+                return;
+            }
+            const fb = await initFirebase();
+            if (!fb || !fb.auth){ showAdminGateError('טעינת Firebase נכשלה. רעננו את הדף ונסו שוב.'); return; }
+            try { await fb.authMod.setPersistence(fb.auth, fb.authMod.browserLocalPersistence); } catch(e){}
+
+            $('admin-signin-btn').addEventListener('click', async () => {
+                try { await fb.authMod.signInWithPopup(fb.auth, new fb.authMod.GoogleAuthProvider()); }
+                catch(e){ showAdminGateError('ההתחברות נכשלה: ' + (e.code || e.message)); }
+            });
+            $('admin-signout-btn').addEventListener('click', () => fb.authMod.signOut(fb.auth));
+
+            fb.authMod.onAuthStateChanged(fb.auth, user => {
+                if (!user) return showAdminGate();
+                if (CFG.adminEmail && (user.email || '').toLowerCase() !== CFG.adminEmail.toLowerCase()){
+                    fb.authMod.signOut(fb.auth);
+                    showAdminGateError('החשבון ' + user.email + ' אינו מורשה לגשת למסך זה.');
+                    return;
+                }
+                $('admin-gate').classList.add('hidden');
+                $('admin-section').classList.remove('hidden');
+                $('admin-user-email').textContent = user.email;
+            });
+        }
+
+        // שמירת רשומת ההצעה בלוח הבקרה — לא חוסם את יצירת הקישור אם נכשל
+        async function saveQuoteRecord(quoteId, data){
+            try {
+                const fb = await initFirebase();
+                if (!fb) return;
+                await fb.fs.setDoc(fb.fs.doc(fb.db, QUOTES_COLLECTION, quoteId), { ...data, status: 'pending', createdAt: fb.fs.serverTimestamp() });
+            } catch(err){ console.warn('quote save failed', err); }
+        }
+
+        /* ================= יצירת קישור ללקוח ================= */
+        const clean = s => String(s == null ? '' : s).replace(/\|/g, '/');
+        function generateShareLink(e){
+            e.preventDefault();
+            const g = id => clean($(id).value.trim());
+            const quoteId = genQuoteId();
+            const clientName = g('in_clientName'), eventType = g('in_eventType'), loc = g('in_location'),
+                  date = g('in_date'), startTime = g('in_startTime'), endTime = g('in_endTime'),
+                  guests = $('in_guests').value || '', price = $('in_price').value,
+                  deposit = $('in_deposit').value || '0', notes = clean($('in_notes').value || ''),
+                  service = $('in_service').value;
+
+            // סדר השדות קבוע — לוח הבקרה בונה מחדש את אותו קישור בדיוק באותו סדר
+            const raw = [clientName, eventType, loc, date, startTime, endTime, guests, price, deposit, notes, quoteId, service].join('|');
+            const url = `${location.origin}${location.pathname}?q=${b64UrlEncode(raw)}`;
+
+            $('shareable-url').value = url;
+            $('link-result').classList.remove('hidden');
+            $('wa-share-btn').href = 'https://wa.me/?text=' + encodeURIComponent(url);
+            $('link-result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            saveQuoteRecord(quoteId, {
+                clientName, eventType, service, location: loc, date, startTime, endTime,
+                guests: Number(guests) || 0, price: Number(price) || 0, deposit: Number(deposit) || 0, notes
+            });
+        }
+
+        function copyGeneratedLink(){
+            const input = $('shareable-url'), t = $('copy-text');
+            const done = () => { t.innerText = 'הועתק ✓'; setTimeout(() => t.innerText = 'העתק', 2000); };
+            input.select();
+            if (navigator.clipboard && navigator.clipboard.writeText)
+                navigator.clipboard.writeText(input.value).then(done).catch(() => { document.execCommand('copy'); done(); });
+            else { document.execCommand('copy'); done(); }
+        }
+
+        /* ================= מצב לקוח ================= */
+        let contractData = {}, PKG_ITEMS = [];
+        const dataParam = new URLSearchParams(location.search).get('q');
+
+        function serviceOf(key){ return P.SERVICES[key] || P.SERVICES[P.DEFAULT_SERVICE]; }
+        function buildPkgItems(){
+            const svc = serviceOf(contractData.service);
+            const actWord = activityHoursWord(contractData.startTime, contractData.endTime);
+            return [ (actWord || hoursWordPlain(svc.hours)) + ' ' + svc.lead ].concat(svc.items, P.COMMON_ITEMS);
+        }
+        function renderPkgList(){ $('pkg-list').innerHTML = PKG_ITEMS.map(x => `<li>${esc(x)}</li>`).join(''); }
+        function termsHtml(){ return '<ol>' + P.termsList(BIZ.name).map(t => `<li>${esc(t)}</li>`).join('') + '</ol>'; }
+
+        if (dataParam) {
+            $('client-view').classList.remove('hidden');
+            // הקישורים לתקנון/פרטיות/נגישות נושאים את ?q= כדי ש"חזרה" תחזיר להצעה עצמה
+            document.querySelectorAll('a[href="terms.html"], a[href="privacy.html"], a[href="accessibility.html"]').forEach(a => {
+                a.setAttribute('href', a.getAttribute('href') + '?q=' + encodeURIComponent(dataParam));
+            });
+            try {
+                const p = b64UrlDecode(dataParam).split('|');
+                if (p.length < 9) throw new Error('bad link');
+                contractData = { name: p[0], type: p[1], location: p[2], date: p[3], startTime: p[4], endTime: p[5],
+                    guests: p[6] || '', price: Number(p[7]) || 0, deposit: Number(p[8]) || 0, notes: p[9] || '', quoteId: p[10] || '',
+                    service: p[11] || P.DEFAULT_SERVICE };
+                const c = contractData, svc = serviceOf(c.service);
+                const set = (id, v) => $(id).innerText = v;
+                const actWord = activityHoursWord(c.startTime, c.endTime);
+                set('view_clientName', c.name);
+                set('view_service', svc.label + (c.type ? ' · ' + c.type : ''));
+                set('view_service2', svc.label);
+                set('view_eventType', c.type);
+                set('view_location', c.location);
+                set('view_date', c.date);
+                $('view_hours').innerHTML = `<span class="ltr">${esc(c.startTime)}–${esc(c.endTime)}</span>${actWord ? `<br><small style="color:var(--muted);font-weight:500">${esc(actWord)}</small>` : ''}`;
+                set('view_guests', c.guests ? `עד ${Number(c.guests).toLocaleString()}` : '—');
+                set('view_price', `₪${c.price.toLocaleString()}`);
+                set('view_price2', `₪${c.price.toLocaleString()}`);
+                set('view_deposit', `₪${c.deposit.toLocaleString()}`);
+                set('view_balance', `₪${(c.price - c.deposit).toLocaleString()}`);
+                set('view_quoteId', c.quoteId ? '#' + c.quoteId.slice(-6).toUpperCase() : '');
+                set('sign-date', new Date().toLocaleDateString('he-IL'));
+                if (c.notes && c.notes.trim()) { $('view_notes_container').classList.remove('hidden'); set('view_notes', c.notes); }
+                document.title = `${BIZ.name} | הצעת מחיר · ${c.name}`;
+                PKG_ITEMS = buildPkgItems();
+                renderPkgList();
+                $('terms-text').innerHTML = termsHtml();
+                setTimeout(resizeCanvas, 300);
+                initCalendarFab();
+            } catch (err) {
+                $('client-view').innerHTML = `<div class="panel panel-body" style="text-align:center; color:var(--bad); font-weight:700">הקישור אינו תקין. בקשו מ-${esc(BIZ.name)} קישור חדש.</div>`;
+                console.error(err);
+            }
+        } else {
+            initAdminGate();
+        }
+
+        /* ================= עזרי PDF ================= */
+        function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[m])); }
+        function dataUrlToBlob(dataUrl){
+            const [head, b64] = dataUrl.split(',');
+            const mime = (head.match(/:(.*?);/) || [])[1] || 'image/png';
+            const bin = atob(b64), arr = new Uint8Array(bin.length);
+            for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+            return new Blob([arr], { type: mime });
+        }
+        // Blob → base64 (בלי התחילית data:) — לשמירת ה-PDF בתוך מסמך Firestore
+        function blobToBase64(blob){
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => { const r = reader.result || ''; const i = r.indexOf(','); resolve(i >= 0 ? r.slice(i + 1) : r); };
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+        }
+        function triggerDownload(blob, name){
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob); a.download = name;
+            document.body.appendChild(a); a.click();
+            setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 6000);
+        }
+
+        function buildPdfDoc(sigDataUrl, meta){
+            const c = contractData, bal = c.price - c.deposit, svc = serviceOf(c.service);
+            const m = meta || lastSigMeta || { ts: new Date(), ip: null, ua: navigator.userAgent };
+            const act = activityHoursWord(c.startTime, c.endTime);
+            $('pdf-doc').innerHTML = `
+              <div class="doc-inner">
+                <div class="doc-section doc-head">
+                  <div><div class="doc-brand">${esc(BIZ.name)}<i>.</i></div><div class="doc-sub">${esc((BIZ.tagline || '').toUpperCase())}</div></div>
+                  <div class="doc-title">הסכם והצעת מחיר להופעה<small>${c.quoteId ? 'מס׳ ' + esc(c.quoteId.slice(-6).toUpperCase()) : ''}</small></div>
+                </div>
+                <div class="doc-section">
+                  <table>
+                    <tr><td class="k">לכבוד</td><td>${esc(c.name)}</td><td class="k">סוג האירוע</td><td>${esc(c.type)}</td></tr>
+                    <tr><td class="k">הרכב / שירות</td><td colspan="3">${esc(svc.label)}</td></tr>
+                    <tr><td class="k">מיקום</td><td>${esc(c.location)}</td><td class="k">תאריך</td><td dir="ltr" style="text-align:right">${esc(c.date)}</td></tr>
+                    <tr><td class="k">שעות</td><td><span dir="ltr">${esc(c.startTime)} - ${esc(c.endTime)}</span>${act ? ' &nbsp;·&nbsp; ' + esc(act) : ''}</td><td class="k">מוזמנים</td><td>${c.guests ? 'עד ' + Number(c.guests).toLocaleString() : '—'}</td></tr>
+                    <tr><td class="k">מחיר כולל</td><td class="hl">${c.price.toLocaleString()} ש"ח</td><td class="k">מקדמה</td><td>${c.deposit.toLocaleString()} ש"ח</td></tr>
+                    <tr><td class="k">יתרה בסיום</td><td colspan="3"><b>${bal.toLocaleString()} ש"ח</b></td></tr>
+                  </table>
+                </div>
+                ${c.notes && c.notes.trim() ? `<div class="doc-section"><div class="doc-h">הערות וסיכומים</div><div class="doc-notes">${esc(c.notes)}</div></div>` : ''}
+                <div class="doc-section">
+                  <div class="doc-h">מה כלול בהופעה</div>
+                  <ul>${PKG_ITEMS.map(x => `<li><span class="mk">✓</span>${esc(x)}</li>`).join('')}</ul>
+                </div>
+                <div class="doc-section">
+                  <div class="doc-h">תנאי ההסכם וביטולים</div>
+                  <ol class="terms-pdf">${P.termsList(BIZ.name).map((t, i) => `<li><span class="mk">${i + 1}.</span>${esc(t)}</li>`).join('')}</ol>
+                </div>
+                <div class="doc-section doc-sign">
+                  <div class="doc-h">אישור וחתימת הלקוח</div>
+                  <p>אני, <b>${esc(c.name)}</b>, מאשר/ת בזאת את פרטי הצעת המחיר ואת תנאי ההסכם המפורטים במסמך זה, וחותם/ת עליהם בחתימה דיגיטלית מחייבת. לצורך תוקפה המשפטי של החתימה מתועדים להלן מועד, כתובת IP וסוג הדפדפן שמהם בוצעה החתימה.</p>
+                  <img class="sig" src="${sigDataUrl}" alt="חתימת הלקוח">
+                  <div class="doc-meta">חתימה דיגיטלית · תאריך: ${m.ts.toLocaleDateString('he-IL')} · שעה: ${m.ts.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}<br>כתובת IP: ${esc(m.ip || 'לא זוהתה')} · דפדפן: ${esc(m.ua)}</div>
+                </div>
+                <div class="doc-foot">${esc(BIZ.name)} · ${esc(SUPPLIER_EMAIL)}${BIZ.phone ? ' · ' + esc(BIZ.phone) : ''} · © ${new Date().getFullYear()} כל הזכויות שמורות</div>
+              </div>`;
+        }
+
+        const PDF_WIDTH_PX = 760;
+        async function generatePdfBlob(sigDataUrl, meta){
+            buildPdfDoc(sigDataUrl, meta);
+            const el = $('pdf-doc');
+            window.scrollTo(0, 0);
+            el.style.cssText = `position:absolute;left:0;top:0;width:${PDF_WIDTH_PX}px;visibility:visible;background:#fff;color:#111;z-index:1;`;
+            // אם טעינת הגופנים נתקעת — לא מחכים לה לנצח
+            if (document.fonts && document.fonts.ready) { try { await withTimeout(document.fonts.ready, 4000, null); } catch(e){} }
+            await new Promise(res => {
+                const img = el.querySelector('img.sig');
+                if (img && !img.complete) { img.onload = res; img.onerror = res; setTimeout(res, 2500); } else res();
+            });
+            await new Promise(r => setTimeout(r, 200));
+            let big;
+            try {
+                big = await withTimeout(html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false,
+                    width: PDF_WIDTH_PX, windowWidth: PDF_WIDTH_PX, x: 0, y: 0, scrollX: 0, scrollY: 0 }), 15000, null);
+            } finally {
+                el.style.cssText = '';
+            }
+            if (!big || big.height < 40) throw new Error('empty canvas');
+
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
+            const pageW = pdf.internal.pageSize.getWidth(), pageH = pdf.internal.pageSize.getHeight();
+            const M = 8, usableW = pageW - M * 2, usableH = pageH - M * 2;
+            const pxPerMm = big.width / usableW, pagePx = Math.floor(usableH * pxPerMm);
+            let y = 0, page = 0;
+            while (y < big.height) {
+                const sliceH = Math.min(pagePx, big.height - y);
+                const s = document.createElement('canvas');
+                s.width = big.width; s.height = sliceH;
+                const sc = s.getContext('2d');
+                sc.fillStyle = '#fff'; sc.fillRect(0, 0, s.width, s.height);
+                sc.drawImage(big, 0, y, big.width, sliceH, 0, 0, big.width, sliceH);
+                if (page > 0) pdf.addPage();
+                pdf.addImage(s.toDataURL('image/jpeg', 0.95), 'JPEG', M, M, usableW, sliceH / pxPerMm);
+                y += sliceH; page++;
+                if (page > 20) break;
+            }
+            const blob = pdf.output('blob');
+            if (!blob || blob.size < 12000) throw new Error('PDF blank (' + (blob ? blob.size : 0) + ')');
+            return blob;
+        }
+
+        function printFallback(){
+            buildPdfDoc(hasSigned ? canvas.toDataURL('image/png') : (lastSigDataUrl || ''), lastSigMeta);
+            document.body.classList.add('printing-doc');
+            window.addEventListener('afterprint', () => document.body.classList.remove('printing-doc'), { once: true });
+            setTimeout(() => window.print(), 250);
+        }
+
+        // תקרת זמן לכל פעולה אסינכרונית — כדי שבקשת רשת תקועה לא תתקע את המסך
+        function withTimeout(promise, ms, fallback){
+            return Promise.race([promise, new Promise(resolve => setTimeout(() => resolve(fallback), ms))]);
+        }
+
+        /* ================= שליחה לעסק ================= */
+        // עותק ב-tmpfiles.org — קישור הורדה מהיר לשעה הראשונה (גיבוי לצירוף במייל)
+        async function uploadPdf(blob, name){
+            try {
+                const fd = new FormData();
+                fd.append('file', blob, name);
+                const r = await withTimeout(fetch('https://tmpfiles.org/api/v1/upload', { method: 'POST', body: fd }), 10000, null);
+                if (!r) return null;
+                const j = await r.json();
+                const u = j && j.data && j.data.url;
+                if (u) return u.replace('tmpfiles.org/', 'tmpfiles.org/dl/');
+            } catch(e){ console.warn('tmpfiles failed', e); }
+            return null;
+        }
+        // כתובת ה-IP הציבורית של המכשיר החותם — לתיעוד ולתוקף משפטי של החתימה
+        async function getClientIp(){
+            try {
+                const r = await withTimeout(fetch('https://api.ipify.org?format=json'), 5000, null);
+                if (!r) return null;
+                const j = await r.json();
+                return (j && j.ip) || null;
+            } catch(e){ console.warn('ip lookup failed', e); return null; }
+        }
+
+        // מגבלת Firestore היא 1MB למסמך; base64 מנפח בכ-33% — נשארים בבטחה מתחת
+        const PDF_MAX_STORE_BYTES = 700 * 1024;
+        // מסמן שכתיבת "נחתם" עדיין באוויר — כפתור היומן ממתין לה לפני שהוא מנווט מהדף
+        let criticalSaveDone = true;
+
+        // שלב 1: סימון "נחתם" (מיידי ונפרד), שלב 2: שמירת ה-PDF עצמו בתוך המסמך
+        async function saveSignedQuote(meta, pdfBlob){
+            const fb = await initFirebase();
+            if (!fb || !contractData.quoteId) { criticalSaveDone = true; return; }
+            const quoteRef = fb.fs.doc(fb.db, QUOTES_COLLECTION, contractData.quoteId);
+            try {
+                await fb.fs.updateDoc(quoteRef, {
+                    status: 'signed', signedAt: fb.fs.serverTimestamp(),
+                    ip: meta && meta.ip ? meta.ip : null, userAgent: meta && meta.ua ? meta.ua : null
+                });
+            } catch(err){ console.warn('quote status update failed', err); criticalSaveDone = true; return; }
+            criticalSaveDone = true;
+            if (pdfBlob && pdfBlob.size <= PDF_MAX_STORE_BYTES) {
+                try {
+                    const pdfData = await withTimeout(blobToBase64(pdfBlob), 10000, null);
+                    if (pdfData) await fb.fs.updateDoc(quoteRef, { pdfData });
+                } catch(err){ console.warn('pdf save to firestore failed', err); }
+            }
+        }
+
+        // דרך א' — Web3Forms (אישור שליחה אמיתי, ה-PDF מצורף)
+        async function sendViaWeb3Forms(fields, pdfBlob, sigBlob, safeName){
+            if (!WEB3FORMS_KEY || WEB3FORMS_KEY.trim().length < 20) return false;
+            try {
+                const fd = new FormData();
+                fd.append('access_key', WEB3FORMS_KEY.trim());
+                fd.append('from_name', `${BIZ.name} · הסכם חתום`);
+                fd.append('subject', fields._subject);
+                Object.entries(fields).forEach(([k, v]) => { if (k[0] !== '_') fd.append(k, v); });
+                if (pdfBlob) fd.append('attachment', new File([pdfBlob], `Contract_${safeName}.pdf`, { type: 'application/pdf' }));
+                if (sigBlob) fd.append('signature', new File([sigBlob], `Signature_${safeName}.png`, { type: 'image/png' }));
+                const r = await withTimeout(fetch('https://api.web3forms.com/submit', { method: 'POST', body: fd }), 12000, null);
+                if (!r) return false;
+                const j = await r.json();
+                return !!j.success;
+            } catch(e){ console.warn('web3forms failed', e); return false; }
+        }
+
+        // דרך ב' — FormSubmit (טופס נסתר; דורש אישור חד-פעמי של מייל ההפעלה)
+        const FS_MAP = { fs_name:'שם הלקוח', fs_type:'סוג אירוע', fs_service:'הרכב / שירות', fs_loc:'מיקום', fs_date:'תאריך האירוע',
+            fs_hours:'שעות', fs_guests:'כמות מוזמנים', fs_price:'מחיר כולל', fs_deposit:'מקדמה', fs_balance:'יתרה לתשלום', fs_notes:'הערות',
+            fs_signed:'נחתם בתאריך', fs_ip:'כתובת IP', fs_ua:'דפדפן (User Agent)', fs_link:'הורדת ההסכם החתום (PDF)' };
+        function sendViaFormSubmit(fields, pdfBlob, sigBlob, safeName){
+            return new Promise(resolve => {
+                if (!SUPPLIER_EMAIL) return resolve(false);
+                const f = $('fs-form');
+                f.action = 'https://formsubmit.co/' + SUPPLIER_EMAIL;
+                $('fs_subject').value = fields._subject;
+                Object.entries(FS_MAP).forEach(([id, key]) => { $(id).value = fields[key] || ''; });
+                try {
+                    const dt = new DataTransfer();
+                    if (pdfBlob) dt.items.add(new File([pdfBlob], `Contract_${safeName}.pdf`, { type: 'application/pdf' }));
+                    if (sigBlob) dt.items.add(new File([sigBlob], `Signature_${safeName}.png`, { type: 'image/png' }));
+                    $('fs_files').files = dt.files;
+                } catch(e){ console.warn('attach skipped', e); }
+                const sink = document.querySelector('iframe[name="fs-sink"]');
+                let done = false;
+                const fin = ok => { if (!done) { done = true; resolve(ok); } };
+                sink.onload = () => fin(true);
+                setTimeout(() => fin(true), 9000);
+                f.submit();
+            });
+        }
+
+        async function sendToBusiness(pdfBlob, sigBlob, safeName, meta){
+            const c = contractData;
+            const m = meta || lastSigMeta || { ts: new Date(), ip: null, ua: navigator.userAgent };
+            const link = pdfBlob ? await uploadPdf(pdfBlob, `${BIZ.name}_Contract_${safeName}.pdf`) : null;
+            const fields = {
+                _subject: `הסכם חתום חדש — ${c.name} (${c.type})`,
+                'שם הלקוח': c.name,
+                'סוג אירוע': c.type,
+                'הרכב / שירות': serviceOf(c.service).label,
+                'מיקום': c.location,
+                'תאריך האירוע': c.date,
+                'שעות': `${c.startTime} - ${c.endTime}`,
+                'כמות מוזמנים': c.guests || '—',
+                'מחיר כולל': `${c.price} ש"ח`,
+                'מקדמה': `${c.deposit} ש"ח`,
+                'יתרה לתשלום': `${c.price - c.deposit} ש"ח`,
+                'הערות': c.notes || '—',
+                'נחתם בתאריך': m.ts.toLocaleString('he-IL'),
+                'כתובת IP': m.ip || 'לא זוהתה',
+                'דפדפן (User Agent)': m.ua,
+                'הורדת ההסכם החתום (PDF)': link ? link + '  (זמין בשעה הקרובה — הקובץ גם מצורף למייל)' : 'הקובץ מצורף למייל'
+            };
+            let ok = await sendViaWeb3Forms(fields, pdfBlob, sigBlob, safeName);
+            if (!ok) ok = await sendViaFormSubmit(fields, pdfBlob, sigBlob, safeName);
+            return { ok, link };
+        }
+
+        /* ================= חתימה ושליחה ================= */
+        async function handleSignatureSubmit(e){
+            e.preventDefault();
+            if (!hasSigned) { alert('נא לחתום בתיבה לפני אישור ההסכם.'); return; }
+            if (!$('agree-terms').checked) { alert('יש לאשר את תנאי השימוש ומדיניות הפרטיות לפני השליחה.'); return; }
+
+            const btn = $('submit-btn'), overlay = $('pdf-overlay');
+            btn.disabled = true; btn.textContent = 'מעבד…';
+            overlay.style.display = 'flex';
+            criticalSaveDone = false;
+
+            lastSigDataUrl = canvas.toDataURL('image/png');
+            const sigBlob = dataUrlToBlob(lastSigDataUrl);
+            const safeName = (contractData.name || 'Client').replace(/[\\/:*?"<>|]+/g, '_');
+
+            btn.textContent = 'מתעד חתימה…';
+            const clientIp = await getClientIp();
+            lastSigMeta = { ts: new Date(), ip: clientIp, ua: navigator.userAgent };
+
+            let pdfBlob = null;
+            try { pdfBlob = await generatePdfBlob(lastSigDataUrl, lastSigMeta); } catch (err) { console.error('PDF failed', err); }
+
+            btn.textContent = 'שולח אישור…';
+            let emailOk = false;
+            try {
+                const [r] = await Promise.all([
+                    sendToBusiness(pdfBlob, sigBlob, safeName, lastSigMeta),
+                    withTimeout(saveSignedQuote(lastSigMeta, pdfBlob), 15000, null)
+                ]);
+                emailOk = r.ok;
+            } catch (err) { console.error(err); }
+
+            // ההורדה רק אחרי שהשליחה והעדכון הסתיימו — בספארי, הורדת Blob עלולה לנווט מהדף
+            if (pdfBlob) { try { triggerDownload(pdfBlob, `${BIZ.name}_Contract_${safeName}.pdf`); } catch (err) { console.error('download failed', err); } }
+
+            overlay.style.display = 'none';
+            const box = $('pdf-hide-controls');
+            if (pdfBlob && emailOk) {
+                box.innerHTML = `<div class="done"><i data-i="party"></i>ההסכם נחתם — נתראה על הרחבה!<span>ה-PDF ירד למכשיר שלכם והאישור נשלח אלינו.</span></div>`;
+            } else {
+                box.innerHTML = `
+                    <div class="warnbox">
+                        <p>${pdfBlob ? '✓ ה-PDF ירד למכשיר.' : '⚠️ יצירת ה-PDF האוטומטית נכשלה.'}</p>
+                        <p>${emailOk ? '✓ האישור והחתימה נשלחו.' : `⚠️ שליחת האישור לא הושלמה — צרו קשר עם ${esc(BIZ.name)}.`}</p>
+                        <p>להורדה / הדפסה של עותק גיבוי מלא:</p>
+                    </div>
+                    <button type="button" id="print-fallback" class="btn btn-hot btn-lg btn-block"><i data-i="printer"></i> הורדה / הדפסה של עותק גיבוי</button>`;
+                $('print-fallback').addEventListener('click', printFallback);
+                btn.disabled = false;
+            }
+            CheckIcons.paint(box);
+        }
+
+        /* ================= כפתור צף · הוספה ליומן ================= */
+        function eventDateParts(){
+            const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(String(contractData.date || '').trim());
+            if (!m) return null;
+            const s = parseHM(contractData.startTime), e = parseHM(contractData.endTime);
+            if (s == null || e == null) return null;
+            let endMin = e; if (endMin <= s) endMin += 24 * 60;
+            const start = new Date(+m[3], +m[2] - 1, +m[1], Math.floor(s / 60), s % 60);
+            const end = new Date(+m[3], +m[2] - 1, +m[1], 0, 0);
+            end.setMinutes(endMin);
+            return { start, end };
+        }
+        function fmtCal(d){ const p = n => String(n).padStart(2, '0'); return d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + 'T' + p(d.getHours()) + p(d.getMinutes()) + '00'; }
+        function calEventInfo(){
+            const parts = eventDateParts();
+            if (!parts) return null;
+            const c = contractData, bal = (c.price || 0) - (c.deposit || 0), svc = serviceOf(c.service);
+            const act = activityHoursWord(c.startTime, c.endTime);
+            const details = [
+                `${BIZ.name} · ${svc.label} — ${c.type || 'אירוע'}`,
+                `לכבוד: ${c.name || ''}`,
+                `שעות: ${c.startTime} - ${c.endTime}` + (act ? ` (${act})` : ''),
+                c.guests ? `מוזמנים: עד ${Number(c.guests).toLocaleString()}` : '',
+                `מחיר כולל: ₪${(c.price || 0).toLocaleString()} · מקדמה: ₪${(c.deposit || 0).toLocaleString()} · יתרה בסיום: ₪${bal.toLocaleString()}`,
+                c.notes && c.notes.trim() ? `הערות: ${c.notes.trim()}` : ''
+            ].filter(Boolean).join('\n');
+            return { start: parts.start, end: parts.end, title: `${BIZ.name} · ${c.type || 'אירוע'}`, location: c.location || '', details };
+        }
+        function detectPlatform(){
+            const ua = navigator.userAgent || '';
+            if (/iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) return 'ios';
+            if (/Android/.test(ua)) return 'android';
+            return 'desktop';
+        }
+        function googleCalUrl(ev){
+            const u = new URL('https://calendar.google.com/calendar/render');
+            u.searchParams.set('action', 'TEMPLATE');
+            u.searchParams.set('text', ev.title);
+            u.searchParams.set('dates', fmtCal(ev.start) + '/' + fmtCal(ev.end));
+            u.searchParams.set('details', ev.details);
+            u.searchParams.set('location', ev.location);
+            u.searchParams.set('ctz', 'Asia/Jerusalem');
+            return u.toString();
+        }
+        // ממתין (עד תקרה קצרה) לסיום כתיבת "נחתם" לפני שמנווטים מהדף
+        function waitForCriticalSave(maxMs){
+            if (criticalSaveDone) return Promise.resolve();
+            return new Promise(resolve => {
+                const start = Date.now();
+                (function check(){ if (criticalSaveDone || Date.now() - start >= maxMs) resolve(); else setTimeout(check, 150); })();
+            });
+        }
+        // אנדרואיד → מסך "אירוע חדש" של היומן במכשיר (עם נפילה ל-Google Calendar)
+        // אייפון ומחשב → Google Calendar עם כל הפרטים מוכנים, צריך רק "שמור"
+        async function addToCalendar(){
+            const ev = calEventInfo();
+            if (!ev) { alert('לא ניתן לקרוא את תאריך האירוע מהקישור.'); return; }
+            await waitForCriticalSave(5000);
+            const plat = detectPlatform(), gcUrl = googleCalUrl(ev);
+            if (plat === 'android') {
+                window.location.href = 'intent:#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.dir/event;'
+                    + 'S.title=' + encodeURIComponent(ev.title) + ';'
+                    + 'S.eventLocation=' + encodeURIComponent(ev.location) + ';'
+                    + 'S.description=' + encodeURIComponent(ev.details) + ';'
+                    + 'l.beginTime=' + ev.start.getTime() + ';'
+                    + 'l.endTime=' + ev.end.getTime() + ';'
+                    + 'S.browser_fallback_url=' + encodeURIComponent(gcUrl) + ';end';
+                return;
+            }
+            if (plat === 'ios') { if (!window.open(gcUrl, '_blank')) window.location.href = gcUrl; return; }
+            const w = 640, h = 720;
+            const x = Math.max(0, (((window.screen && screen.width) || 1200) - w) / 2);
+            const y = Math.max(0, (((window.screen && screen.height) || 800) - h) / 2);
+            if (!window.open(gcUrl, 'check_calendar', `popup=yes,width=${w},height=${h},left=${x},top=${y}`)) window.open(gcUrl, '_blank');
+        }
+        function initCalendarFab(){
+            if (!eventDateParts()) return;
+            const wrap = $('cal-fab-wrap'), fab = $('cal-fab'), label = $('cal-fab-label');
+            wrap.classList.remove('hidden');
+            fab.addEventListener('click', () => {
+                addToCalendar();
+                fab.classList.add('is-busy'); label.textContent = 'נפתח ביומן…';
+                setTimeout(() => { fab.classList.remove('is-busy'); label.textContent = 'הוסף ליומן'; }, 2500);
+            });
+        }
+    </script>
+    <script src="cookie-consent.js"></script>
+    <script src="a11y.js"></script>
+</body>
+</html>

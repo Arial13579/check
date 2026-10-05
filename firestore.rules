@@ -1,0 +1,36 @@
+rules_version = '2';
+// CHECK · כללי אבטחה ל-Firestore — להדביק ב: Firebase Console → Firestore Database → Rules → Publish
+//
+// • רק המנהל (adminEmail) יכול לקרוא, ליצור ולמחוק הצעות.
+// • לקוח (בלי התחברות) יכול רק לסמן הצעה קיימת כ"נחתמה" ולצרף את ה-PDF החתום —
+//   ורק את השדות האלה, ורק כל עוד היא עדיין לא נחתמה.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'arielkahalani1@gmail.com'
+        && request.auth.token.email_verified == true;
+    }
+
+    match /check_quotes/{quoteId} {
+      allow read, create, delete: if isAdmin();
+
+      allow update: if isAdmin()
+        || (
+          // שלב 1 בחתימה: סימון "נחתם" + תיעוד IP ודפדפן
+          resource.data.status == 'pending'
+          && request.resource.data.status == 'signed'
+          && request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(['status', 'signedAt', 'ip', 'userAgent'])
+        )
+        || (
+          // שלב 2 בחתימה: צירוף קובץ ה-PDF (פעם אחת בלבד)
+          resource.data.status == 'signed'
+          && !('pdfData' in resource.data)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['pdfData'])
+          && request.resource.data.pdfData is string
+          && request.resource.data.pdfData.size() < 1000000
+        );
+    }
+  }
+}

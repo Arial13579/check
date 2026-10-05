@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#F3EEE4">
+<title>הדף לא נמצא | CHECK</title>
+<meta name="description" content="הדף שחיפשת לא נמצא.">
+<link rel="icon" href="/check/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Rubik:wght@700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/check/theme.css">
+<link rel="stylesheet" href="/check/legal.css">
+</head>
+<body>
+<div class="doc-wrap">
+  <div class="doc-top">
+    <a class="wordmark" href="/check/"><span class="mark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12.5 9 18 20.5 6"/></svg></span><span class="name brand-name">CHECK<i>.</i></span></a>
+    <a class="back" href="/check/">→ חזרה לעמוד הראשי</a>
+  </div>
+    <div class="card" style="text-align:center; padding:40px 22px">
+    <div style="font-family:Rubik,sans-serif; font-weight:900; font-size:clamp(72px,22vw,140px); line-height:1; color:var(--hot); -webkit-text-stroke:3px var(--ink); text-shadow:6px 6px 0 var(--ink)">404</div>
+    <h1 style="font-family:Rubik,sans-serif; font-size:24px; margin:18px 0 8px">הרחבה ריקה כאן…</h1>
+    <p style="margin:0 0 20px">הדף שחיפשת לא נמצא. ייתכן שהקישור שגוי או שפג תוקפו.</p>
+    <a class="btn btn-hot" href="/check/">חזרה לעמוד הראשי</a>
+  </div>
+
+  <footer class="site-foot">
+    <nav class="pills" aria-label="מסמכים">
+      <a href="/check/terms.html">תקנון ותנאי שימוש</a>
+      <a href="/check/privacy.html">פרטיות ועוגיות</a>
+      <a href="/check/accessibility.html">הצהרת נגישות</a>
+    </nav>
+  </footer>
+</div>
+<script src="/check/config.js"></script>
+<script>
+  // שם העסק והמייל מתוך config.js; ואם הגענו מהצעת מחיר (?q=) — "חזרה" מחזירה בדיוק אליה
+  (function(){
+    var b = (window.CHECK_CONFIG || {}).business || {};
+    var name = b.name || 'CHECK', mail = b.email || (window.CHECK_CONFIG || {}).adminEmail || '';
+    document.querySelectorAll('.brand-name').forEach(function(el){ el.textContent = name; var i = document.createElement('i'); i.textContent = '.'; el.appendChild(i); });
+    document.querySelectorAll('.biz').forEach(function(el){ el.textContent = name; });
+    document.querySelectorAll('a.mail').forEach(function(a){ a.href = 'mailto:' + mail; a.textContent = mail; });
+    document.title = document.title.replace('CHECK', name);
+    var q = new URLSearchParams(location.search).get('q');
+    if (!q) return;
+    var url = './?q=' + encodeURIComponent(q);
+    document.querySelectorAll('a.back, a.wordmark').forEach(function(a){ a.href = url; });
+    document.querySelector('a.back').textContent = '→ חזרה להצעת המחיר שלך';
+    document.querySelectorAll('.pills a').forEach(function(a){ a.href = a.getAttribute('href') + '?q=' + encodeURIComponent(q); });
+  })();
+</script>
+<script src="/check/cookie-consent.js"></script>
+<script src="/check/a11y.js"></script>
+</body>
+</html>
