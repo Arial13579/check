@@ -51,6 +51,13 @@
 ## שירותי צד שלישי
 GitHub Pages · Firebase (Auth + Firestore, ה-SDK נטען מ-gstatic) · FormSubmit · Web3Forms (לא פעיל) · tmpfiles.org (עותק PDF לשעה) · ipify · Nominatim · OSRM · cdnjs (html2canvas, jsPDF) · jsDelivr (Chart.js) · Google Fonts · wa.me · Google Calendar / Android intent.
 
+## ⚠️ עדכון 2026-10-06: מערכת הספקים נבנתה ב-repository ‏system.snapbox
+הזיכרון המלא נמצא שם, ב-`.claude/CLAUDE.md`. בקצרה:
+- כניסת ספקים ולוח ניהול: system.snapbox.co.il/vendors/
+- צד הלקוח: אתר ניטרלי (`hatzaa`), כרגע שמור ב-`_customer-site/`.
+- הנתונים נשמרים בפרויקט Firebase הזה (check-b2a66) תחת `tenants/{slug}/quotes`. כללים חדשים פורסמו, ו-`check_quotes` ממשיך לעבוד.
+הסעיף הבא הוא התכנון המקורי, ונשאר לתיעוד.
+
 ## התוכנית הבאה: מכירת המערכת לעסקים אחרים (הוחלט 2026-10-06)
 **המודל:**
 - מערכת אחת שבה הרבה לקוחות (multi-tenant), באותו פרויקט Firebase של הבעלים.
