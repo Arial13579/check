@@ -971,10 +971,10 @@
             if (!fb || !contractData.quoteId) { criticalSaveDone = true; return; }
             const quoteRef = fb.fs.doc(fb.db, QUOTES_COLLECTION, contractData.quoteId);
             try {
-                await fb.fs.updateDoc(quoteRef, {
-                    status: 'signed', signedAt: fb.fs.serverTimestamp(),
-                    ip: meta && meta.ip ? meta.ip : null, userAgent: meta && meta.ua ? meta.ua : null
-                });
+                const base = { status: 'signed', signedAt: fb.fs.serverTimestamp(), ip: null, userAgent: meta && meta.ua ? String(meta.ua).slice(0, 500) : null };
+                // signedQ: הפרטים בדיוק כפי שהוצגו ללקוח. אם הכללים עוד לא עודכנו — חותמים בלעדיו
+                try { await fb.fs.updateDoc(quoteRef, { ...base, signedQ: String(new URLSearchParams(location.search).get('q') || '').slice(0, 7900) }); }
+                catch(e1){ await fb.fs.updateDoc(quoteRef, base); }
             } catch(err){ console.warn('quote status update failed', err); criticalSaveDone = true; return; }
             criticalSaveDone = true;
             if (pdfBlob && pdfBlob.size <= PDF_MAX_STORE_BYTES) {
