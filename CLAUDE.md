@@ -42,7 +42,7 @@
 **חישוב המחיר:** בסיס ההרכב + תוספת לפי כמות מוזמנים + נסיעה מתל אביב (Nominatim/OSRM) + זמן נוסף מעבר ל-`hours`, מעוגל לרבע שעה.
 
 **זרימת החתימה:**
-1. מקבלים IP מ-ipify.
+1. (מ-2026-10-07 לא אוספים IP בכלל, לבקשת הבעלים. `getClientIp` מחזיר `null`.)
 2. יוצרים PDF עם html2canvas + jsPDF (בדפדפן של הלקוח).
 3. במקביל: שולחים מייל (Web3Forms אם יש מפתח, אחרת FormSubmit) ומעדכנים את Firestore ל-`status:'signed'` ואז מוסיפים `pdfData` (אם הקובץ עד 700KB).
 4. רק בסוף מורידים את ה-PDF למכשיר (בגלל ספארי באייפון).
@@ -57,7 +57,7 @@
 - Web3Forms: לא מוגדר (`WEB3FORMS_KEY` ריק). FormSubmit צריך הפעלה חד-פעמית במייל, דרך הכפתור "Activate Form".
 
 ## שירותי צד שלישי
-GitHub Pages · Firebase (Auth + Firestore, ה-SDK נטען מ-gstatic) · FormSubmit · Web3Forms (לא פעיל) · tmpfiles.org (עותק PDF לשעה) · ipify · Nominatim · OSRM · cdnjs (html2canvas, jsPDF) · jsDelivr (Chart.js) · Google Fonts · wa.me · Google Calendar / Android intent.
+GitHub Pages · Firebase (Auth + Firestore, ה-SDK נטען מ-gstatic) · FormSubmit · Web3Forms (לא פעיל) · tmpfiles.org (עותק PDF לשעה) · Nominatim · OSRM · cdnjs (html2canvas, jsPDF) · jsDelivr (Chart.js) · Google Fonts · wa.me · Google Calendar / Android intent.
 
 ## ⚠️ עדכון 2026-10-06: מערכת הספקים נבנתה ב-repository ‏system.snapbox
 הזיכרון המלא נמצא שם, ב-`.claude/CLAUDE.md`. בקצרה:
