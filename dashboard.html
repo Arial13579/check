@@ -232,6 +232,16 @@
     const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(String(dateStr || '').trim());
     return m ? { key: `${m[3]}-${m[2]}`, label: `${m[2]}/${m[3]}` } : null;
   }
+  // האם הלקוח חתם על פרטים שונים מההצעה ששלחנו? (signedQ = הפרטים בדיוק כפי שהוצגו לו)
+  function signedMismatch(q){
+    if (q.status !== 'signed' || !q.signedQ) return false;
+    try {
+      let str = String(q.signedQ).replace(/-/g, '+').replace(/_/g, '/'); while (str.length % 4) str += '=';
+      const bin = atob(str), b = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) b[i] = bin.charCodeAt(i);
+      const p = new TextDecoder().decode(b).split('|'), n = (x, y) => (Number(x) || 0) !== (Number(y) || 0);
+      return p[10] !== q.id || n(p[7], q.price) || n(p[8], q.deposit) || String(p[3] || '') !== String(q.date || '');
+    } catch(e) { return true; }
+  }
   function b64UrlEncode(str){
     const bytes = new TextEncoder().encode(str);
     let bin = ''; bytes.forEach(b => bin += String.fromCharCode(b));
@@ -305,7 +315,7 @@
 
     tbody.innerHTML = rows.map(q => {
       const signed = q.status === 'signed', signedAt = fmtTs(q.signedAt);
-      const pill = signed ? `<span class="pill signed">נחתם</span>${signedAt ? `<div class="sub">${signedAt}</div>` : ''}` : '<span class="pill pending">ממתין</span>';
+      const pill = signed ? `<span class="pill signed">נחתם</span>${signedAt ? `<div class="sub">${signedAt}</div>` : ''}${signedMismatch(q) ? '<div class="sub" style="color:#B91C1C;font-weight:700">⚠ נחתם על פרטים שונים מההצעה</div>' : ''}` : '<span class="pill pending">ממתין</span>';
       const file = q.pdfData
         ? `<div class="acts"><button type="button" class="rowbtn view-file" data-id="${q.id}">${CheckIcons.svg('eye')} צפייה</button><button type="button" class="rowbtn upload-file" data-id="${q.id}">${CheckIcons.svg('refresh')} החלף</button></div>`
         : `<button type="button" class="rowbtn upload-file" data-id="${q.id}">${CheckIcons.svg('upload')} העלאה</button>`;

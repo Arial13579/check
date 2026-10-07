@@ -973,7 +973,8 @@
             try {
                 await fb.fs.updateDoc(quoteRef, {
                     status: 'signed', signedAt: fb.fs.serverTimestamp(),
-                    ip: meta && meta.ip ? meta.ip : null, userAgent: meta && meta.ua ? meta.ua : null
+                    ip: null, userAgent: meta && meta.ua ? String(meta.ua).slice(0, 500) : null,
+                    signedQ: String(new URLSearchParams(location.search).get('q') || '').slice(0, 7900)   // הפרטים בדיוק כפי שהוצגו ללקוח
                 });
             } catch(err){ console.warn('quote status update failed', err); criticalSaveDone = true; return; }
             criticalSaveDone = true;
