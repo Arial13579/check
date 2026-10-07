@@ -256,7 +256,7 @@
                 </form>
 
                 <div id="link-result" class="result hidden" style="margin-top:18px">
-                    <p>✓ הקישור מוכן — נפתח ישירות בהצעת המחיר</p>
+                    <p>✓ הקישור מוכן. בוואטסאפ הלקוח יקבל את התמונה, ומתחתיה קישור קצר להצעה.</p>
                     <div class="row">
                         <input type="text" id="shareable-url" readonly dir="ltr" class="field">
                         <button type="button" id="copy-btn" class="btn btn-sm btn-ink"><i data-i="copy"></i><span id="copy-text">העתק</span></button>
@@ -691,9 +691,27 @@
             } catch(err){ console.warn('quote save failed', err); }
         }
 
+        /* ================= קישור קצר (?k=<מזהה>) =================
+           ההודעה ללקוח בוואטסאפ: התמונה, ומתחתיה שורה קצרה עם הקישור להצעה.
+           הנתונים של הקישור המלא נשמרים ב-shortLinks (קריאה לפי מזהה פתוחה לכולם, כמו הקישור המלא עצמו).
+           אם השמירה נכשלת — משתמשים בקישור המלא ?q=, שממשיך לעבוד. */
+        async function makeShortLink(q){
+            const fb = await initFirebase();
+            if (!fb) return null;
+            const abc = 'abcdefghijklmnopqrstuvwxyz0123456789';
+            for (let i = 0; i < 3; i++){
+                const id = Array.from(crypto.getRandomValues(new Uint8Array(10)), b => abc[b % abc.length]).join('');
+                try {
+                    await fb.fs.setDoc(fb.fs.doc(fb.db, 'shortLinks', id), { q, kind: 'quote', tenant: 'check', createdAt: fb.fs.serverTimestamp() });
+                    return id;
+                } catch(err){ console.warn('short link failed', err && err.code); }
+            }
+            return null;
+        }
+
         /* ================= יצירת קישור ללקוח ================= */
         const clean = s => String(s == null ? '' : s).replace(/\|/g, '/');
-        function generateShareLink(e){
+        async function generateShareLink(e){
             e.preventDefault();
             const g = id => clean($(id).value.trim());
             const quoteId = genQuoteId();
@@ -705,7 +723,13 @@
 
             // סדר השדות קבוע — לוח הבקרה בונה מחדש את אותו קישור בדיוק באותו סדר
             const raw = [clientName, eventType, loc, date, startTime, endTime, guests, price, deposit, notes, quoteId, service].join('|');
-            const url = `${location.origin}${location.pathname}?q=${b64UrlEncode(raw)}`;
+            const q = b64UrlEncode(raw), base = `${location.origin}${location.pathname}`;
+
+            const btn = $('gen-btn'), btnHtml = btn.innerHTML;
+            btn.disabled = true; btn.textContent = 'יוצר קישור…';
+            const shortId = await Promise.race([makeShortLink(q).catch(() => null), new Promise(r => setTimeout(() => r(null), 8000))]);
+            btn.disabled = false; btn.innerHTML = btnHtml;
+            const url = shortId ? `${base}?k=${shortId}` : `${base}?q=${q}`;
 
             $('shareable-url').value = url;
             $('link-result').classList.remove('hidden');
@@ -714,7 +738,8 @@
 
             saveQuoteRecord(quoteId, {
                 clientName, eventType, service, location: loc, date, startTime, endTime,
-                guests: Number(guests) || 0, price: Number(price) || 0, deposit: Number(deposit) || 0, notes
+                guests: Number(guests) || 0, price: Number(price) || 0, deposit: Number(deposit) || 0, notes,
+                ...(shortId ? { shortId } : {})
             });
         }
 
@@ -780,6 +805,21 @@
                 $('client-view').innerHTML = `<div class="panel panel-body" style="text-align:center; color:var(--bad); font-weight:700">הקישור אינו תקין. בקשו מ-${esc(BIZ.name)} קישור חדש.</div>`;
                 console.error(err);
             }
+        } else if (/^[a-z0-9]{6,20}$/.test(new URLSearchParams(location.search).get('k') || '')) {
+            // קישור קצר (?k=): שולפים את הנתונים מ-shortLinks ועוברים לקישור המלא (בלי התחברות, כמו ?q=)
+            const k = new URLSearchParams(location.search).get('k');
+            $('client-view').classList.remove('hidden');
+            $('client-view').innerHTML = '<div class="panel panel-body" style="text-align:center; font-weight:700">טוען את הצעת המחיר…</div>';
+            (async () => {
+                let q = null;
+                try {
+                    const fb = await initFirebase();
+                    const snap = fb ? await fb.fs.getDoc(fb.fs.doc(fb.db, 'shortLinks', k)) : null;
+                    if (snap && snap.exists()) q = snap.data().q || null;
+                } catch(err){ console.warn('short link failed', err); }
+                if (q) location.replace(location.pathname + '?q=' + q);
+                else $('client-view').innerHTML = `<div class="panel panel-body" style="text-align:center; color:var(--bad); font-weight:700">ההצעה לא נמצאה. בקשו מ-${esc(BIZ.name)} קישור חדש.</div>`;
+            })();
         } else {
             initAdminGate();
         }

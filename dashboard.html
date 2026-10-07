@@ -203,7 +203,12 @@
 
   // מחיקת הצעה (הקובץ החתום שמור בתוך אותו מסמך ונמחק איתו)
   async function deleteQuote(id){
-    try { await fs.deleteDoc(fs.doc(db, COLLECTION, id)); return true; }
+    const rec = QUOTES.find(x => x.id === id);
+    try {
+      await fs.deleteDoc(fs.doc(db, COLLECTION, id));
+      if (rec && rec.shortId) fs.deleteDoc(fs.doc(db, 'shortLinks', rec.shortId)).catch(() => {});   // גם הקישור הקצר
+      return true;
+    }
     catch(err){ console.error(err); alert('המחיקה נכשלה: ' + (err.message || err)); return false; }
   }
 
@@ -238,6 +243,7 @@
     const raw = [c(q.clientName), c(q.eventType), c(q.location), c(q.date), c(q.startTime), c(q.endTime),
       q.guests || '', q.price || 0, q.deposit || 0, c(q.notes), q.id, q.service || PR.DEFAULT_SERVICE].join('|');
     const base = location.origin + location.pathname.replace(/dashboard\.html$/, '');
+    if (q.shortId) return base + '?k=' + q.shortId;   // הקישור הקצר, כמו שנשלח ללקוח
     return base + '?q=' + b64UrlEncode(raw);
   }
   function copyText(t, btn){
